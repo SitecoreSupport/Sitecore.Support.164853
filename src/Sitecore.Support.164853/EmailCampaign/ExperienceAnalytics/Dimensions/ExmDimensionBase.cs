@@ -152,34 +152,52 @@
 
             var customValuesHolder = _exmExpert.GetEmailFingerPrints(visit);
 
+            if (customValuesHolder?.ExmCustomValues == null)
+            {
+                yield break;
+            }
+
             var dimensions = new Dictionary<ExmPageEventType, string>();
 
-            if (customValuesHolder != null && customValuesHolder.ExmCustomValues != null)
+
+            var indexes = customValuesHolder.ExmCustomValues.Keys.ToArray();
+
+            for (var i = 0; i < indexes.Length; i++)
             {
-                var indexes = customValuesHolder.ExmCustomValues.Keys.ToArray();
-
-                for (var i = 0; i < indexes.Length; i++)
+                if (indexes[i] > visit.Pages.Count)
                 {
-                    var firstPageIndex = indexes[i] - 1;
-                    var lastPageIndex = i == indexes.Length - 1 ? visit.Pages.Count - 1 : indexes[i + 1] - 2;
+                    Logger.LogWarn($"[GetClickEventData] CustomValues key is greater than the page count, aborting click aggregation for Interaction {visit.InteractionId}");
+                    yield break;
+                }
 
-                    visitState.CustomValues = customValuesHolder.ExmCustomValues[indexes[i]];
+                int firstPageIndex = indexes[i] - 1;
+                int lastPageIndex;
+                if (indexes.Length > i + 1)
+                {
+                    lastPageIndex = indexes[i + 1] - 2;
+                }
+                else
+                {
+                    lastPageIndex = visit.Pages.Count - 1;
+                }
 
-                    var baseKey = GenerateBaseKey(visitState);
-                    if (baseKey != null)
+                visitState.CustomValues = customValuesHolder.ExmCustomValues[indexes[i]];
+
+                var baseKey = GenerateBaseKey(visitState);
+                if (baseKey != null)
+                {
+                    visitState.LandingPage = visit.Pages[firstPageIndex];
+
+                    var dimensionData = GenerateDimension(visit, visitState, firstPageIndex, lastPageIndex, baseKey);
+
+                    if (dimensionData != null && !dimensions.Any(d => d.Key == ExmPageEventType.Unsubscribe && d.Value == dimensionData.DimensionKey))
                     {
-                        visitState.LandingPage = visit.Pages[firstPageIndex];
-
-                        var dimensionData = GenerateDimension(visit, visitState, firstPageIndex, lastPageIndex, baseKey);
-
-                        if (dimensionData != null && !dimensions.Any(d => d.Key == ExmPageEventType.Unsubscribe && d.Value == dimensionData.DimensionKey))
-                        {
-                            dimensions[visitState.PageEvent] = dimensionData.DimensionKey;
-                            yield return dimensionData;
-                        }
+                        dimensions[visitState.PageEvent] = dimensionData.DimensionKey;
+                        yield return dimensionData;
                     }
                 }
             }
+
         }
 
         private DimensionData GenerateDimension(VisitData visit, VisitAggregationState visitState, int firstPageIndex, int lastPageIndex, string baseKey)

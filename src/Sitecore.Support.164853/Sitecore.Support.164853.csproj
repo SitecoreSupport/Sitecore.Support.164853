@@ -87,8 +87,17 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EmailCampaign\ExperienceAnalytics\Dimensions\ByAbTestVariant.cs" />
+    <Compile Include="EmailCampaign\ExperienceAnalytics\Dimensions\ByDemographics.cs" />
+    <Compile Include="EmailCampaign\ExperienceAnalytics\Dimensions\ByDevice.cs" />
+    <Compile Include="EmailCampaign\ExperienceAnalytics\Dimensions\ByLandingPage.cs" />
+    <Compile Include="EmailCampaign\ExperienceAnalytics\Dimensions\ByLocation.cs" />
+    <Compile Include="EmailCampaign\ExperienceAnalytics\Dimensions\ByMessage.cs" />
+    <Compile Include="EmailCampaign\ExperienceAnalytics\Dimensions\ByTimeOfDay.cs" />
     <Compile Include="EmailCampaign\ExperienceAnalytics\Dimensions\ExmDimensionBase.cs" />
+    <Compile Include="EmailCampaign\ExperienceAnalytics\Dimensions\ExmExpert.cs" />
     <Compile Include="EmailCampaign\ExperienceAnalytics\Dimensions\VisitAggregationState.cs" />
+    <Compile Include="EmailCampaign\ExperienceAnalytics\Properties\Settings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
